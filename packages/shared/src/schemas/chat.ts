@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-export const TOOL_NAMES = ['search_historical_event', 'register_interaction'] as const;
+export const TOOL_NAMES = [
+  'search_historical_event',
+  'get_historical_events',
+  'register_favorite_event',
+] as const;
 
 export const toolNameSchema = z.enum(TOOL_NAMES);
 
