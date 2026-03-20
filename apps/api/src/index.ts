@@ -1,12 +1,11 @@
-import Fastify from 'fastify';
-
-const server = Fastify({ logger: true });
-
-server.get('/health', async () => ({ status: 'ok' }));
+import { env } from './config/env.js';
+import { buildServer } from './app/server.js';
 
 const start = async () => {
+  const server = await buildServer();
+
   try {
-    await server.listen({ port: 3001, host: '0.0.0.0' });
+    await server.listen({ port: env.PORT, host: '0.0.0.0' });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
@@ -14,3 +13,4 @@ const start = async () => {
 };
 
 start();
+
