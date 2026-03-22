@@ -2,7 +2,7 @@ import type { AssistantTurnRequest, AssistantTurnResponse, ToolName } from '@his
 import { buildSystemPrompt } from './build-system-prompt.js';
 import { TOOL_DEFINITIONS } from './tool-definitions.js';
 import { executeToolCall } from '../infrastructure/tools/tool-executor.js';
-import { geminiAdapter } from '../infrastructure/gemini.adapter.js';
+import { groqAdapter } from '../infrastructure/groq.adapter.js';
 import type { ToolCallResult } from '@historibot/shared';
 
 export const processAssistantTurn = async (
@@ -18,7 +18,13 @@ export const processAssistantTurn = async (
   ): Promise<unknown> => {
     try {
       const data = await executeToolCall(name, args);
-      toolCall = { tool: name, success: true, data };
+      // For register_favorite_event, include the eventTitle used by the LLM
+      // so the frontend can identify and mark the correct message bubble.
+      const enrichedData =
+        name === 'register_favorite_event' && typeof args.eventTitle === 'string'
+          ? { ...(typeof data === 'object' && data !== null ? (data as object) : {}), savedEventTitle: args.eventTitle }
+          : data;
+      toolCall = { tool: name, success: true, data: enrichedData };
       return data;
     } catch {
       toolCall = { tool: name, success: false };
@@ -27,7 +33,7 @@ export const processAssistantTurn = async (
     }
   };
 
-  const result = await geminiAdapter.generate({
+  const result = await groqAdapter.generate({
     systemPrompt: buildSystemPrompt(),
     message: input.message,
     history: input.history,
