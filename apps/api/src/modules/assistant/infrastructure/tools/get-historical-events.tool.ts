@@ -16,5 +16,13 @@ const resolveDate = (date?: string): { month: number; day: number } => {
 
 export const getHistoricalEvents = async (date?: string): Promise<unknown> => {
   const { month, day } = resolveDate(date);
-  return historicalEventsAdapter.getByDate(month, day);
+  const result = await historicalEventsAdapter.getByDate(month, day);
+
+  // Return a pre-formatted string with ||| separators so the LLM just
+  // repeats it verbatim without reformatting into prose.
+  const formatted = result.events
+    .map(e => `En ${e.year}, ${e.description.replace(/^[^:]+:\s*/, '')}`)
+    .join('|||');
+
+  return { formatted, date: result.date };
 };
