@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter @historibot/web build",
+  "buildCommand": "pnpm --filter @historibot/shared build && pnpm --filter @historibot/web build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install",
   "framework": "vite",
