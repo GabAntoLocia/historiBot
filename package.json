@@ -2,6 +2,7 @@
   "name": "historibot",
   "private": true,
   "scripts": {
+    "predev": "pnpm -F @historibot/shared build",
     "dev": "pnpm run --parallel dev",
     "dev:api": "pnpm -F @historibot/api dev",
     "dev:web": "pnpm -F @historibot/web dev",
