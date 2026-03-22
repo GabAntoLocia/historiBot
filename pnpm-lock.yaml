@@ -25,6 +25,9 @@ importers:
       fastify:
         specifier: ^5.0.0
         version: 5.8.2
+      groq-sdk:
+        specifier: ^1.1.1
+        version: 1.1.1
       zod:
         specifier: ^3.23.0
         version: 3.25.76
@@ -748,6 +751,10 @@ packages:
 
   get-tsconfig@4.13.6:
     resolution: {integrity: sha512-shZT/QMiSHc/YBLxxOkMtgSid5HFoauqCE3/exfsEcwg1WkeqjG+V40yBbBrsD+jW2HDXcs28xOfcbm2jI8Ddw==}
+
+  groq-sdk@1.1.1:
+    resolution: {integrity: sha512-p0fb/sfrYfUDJf+b4s+ptV6XrQnY0gA0u2pbaH4E1l6yaeLCKtdX5OBhP/wXXBuKrSnU9w45RaFebfJDWxsXMw==}
+    hasBin: true
 
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
@@ -1522,6 +1529,8 @@ snapshots:
   get-tsconfig@4.13.6:
     dependencies:
       resolve-pkg-maps: 1.0.0
+
+  groq-sdk@1.1.1: {}
 
   he@1.2.0: {}
 
