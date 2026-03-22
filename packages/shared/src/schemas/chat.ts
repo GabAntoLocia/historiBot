@@ -32,7 +32,8 @@ export const assistantTurnResponseSchema = z.object({
 export const voicebotStatusSchema = z.enum([
   'idle',
   'listening',
-  'processing',
+  'transcribing',
+  'thinking',
   'speaking',
   'error',
 ]);
