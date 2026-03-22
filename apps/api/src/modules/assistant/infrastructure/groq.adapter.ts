@@ -45,13 +45,29 @@ const createGroqAdapter = (apiKey: string): LLMPort => ({
       { role: 'user', content: params.message },
     ];
 
-    // Primer turno
-    const firstResponse = await client.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages,
-      tools: params.tools.map(toGroqTool),
-      tool_choice: 'auto',
-    });
+    const groqTools = params.tools.map(toGroqTool);
+
+    // Primer turno — a veces llama-3.3-70b genera tool calls en formato XML inválido,
+    // en ese caso reintentamos sin tools para obtener una respuesta de texto.
+    let firstResponse: Groq.Chat.Completions.ChatCompletion;
+    try {
+      firstResponse = await client.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        tools: groqTools,
+        tool_choice: 'auto',
+      });
+    } catch (err: unknown) {
+      const isToolFormatError =
+        err instanceof Error && err.message.includes('tool_use_failed');
+      if (!isToolFormatError) throw err;
+      // Reintento sin tools: el modelo responderá en texto plano
+      firstResponse = await client.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+      });
+      return { text: firstResponse.choices[0].message.content ?? '', toolCallUsed: null };
+    }
 
     const firstMessage = firstResponse.choices[0].message;
 
@@ -67,15 +83,12 @@ const createGroqAdapter = (apiKey: string): LLMPort => ({
 
     const toolResult = await params.onToolCall(toolName, toolArgs);
 
-    // Segundo turno: enviamos el resultado de la tool
-    const toolResultContent = JSON.stringify(toolResult);
-
-    // When the tool returns events from the history API, force Spanish translation
-    // by appending an explicit instruction right before the final generation.
+    // Segundo turno: enviamos el resultado de la tool.
+    // tool_choice: 'none' — el modelo SOLO puede responder con texto, no llamar más tools.
     const secondMessages: Groq.Chat.Completions.ChatCompletionMessageParam[] = [
       ...messages,
       firstMessage,
-      { role: 'tool', tool_call_id: call.id, content: toolResultContent },
+      { role: 'tool', tool_call_id: call.id, content: JSON.stringify(toolResult) },
     ];
 
     if (toolName === 'get_historical_events') {
@@ -89,7 +102,8 @@ const createGroqAdapter = (apiKey: string): LLMPort => ({
     const secondResponse = await client.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: secondMessages,
-      tools: params.tools.map(toGroqTool),
+      tools: groqTools,
+      tool_choice: 'none',
     });
 
     return {
