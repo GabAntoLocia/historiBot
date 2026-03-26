@@ -201,7 +201,7 @@ pnpm typecheck    # type-check ambas apps
 
 ## Probar la app
 
-1. Abrir http://localhost:5173 en **Microsoft Edge** (recomendado — Chrome bloquea los endpoints de Google STT en algunas redes)
+1. Abrir http://localhost:5173 en **Chrome** (recomendado — Microsoft Edge bloquea los endpoints de Google STT en algunas redes)
 2. Presionar **Hablar** y hablar, o escribir en el input de texto
 3. Consultas de ejemplo:
    - *"¿Qué pasó hoy en la historia?"*
